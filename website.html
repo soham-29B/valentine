@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be My Valentine? ❤️</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to top, #fad0c4, #ffd1ff);
+    font-family: 'Quicksand', sans-serif;
+    overflow: hidden;
+    transition: background 1s ease;
+}
+
+/* Floating Hearts */
+.bg-hearts {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bg-heart {
+    position: absolute;
+    bottom: -40px;
+    font-size: 20px;
+    animation: floatUp linear infinite;
+    opacity: 0.6;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(0) scale(0.8); opacity: 0; }
+    20% { opacity: 0.7; }
+    100% { transform: translateY(-120vh) scale(1.2); opacity: 0; }
+}
+
+/* Card */
+.card {
+    background: rgba(255,255,255,0.9);
+    padding: 2.5rem;
+    border-radius: 25px;
+    box-shadow: 0 15px 35px rgba(255,105,180,0.3);
+    text-align: center;
+    max-width: 380px;
+    width: 90%;
+    z-index: 10;
+}
+
+h1 {
+    color: #ff6b6b;
+    margin: 20px 0;
+}
+
+/* Puppy */
+.gif-container {
+    height: 200px;
+    background: #fff0f5;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#mascot {
+    max-height: 100%;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.fade-out { opacity: 0; transform: scale(0.9); }
+.fade-in  { opacity: 1; transform: scale(1); }
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-6px); }
+    100% { transform: translateX(0); }
+}
+.shake { animation: shake 0.4s; }
+
+/* Buttons */
+.btn-container {
+    position: relative;
+    height: 60px;
+}
+
+button {
+    padding: 15px 35px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#yesBtn {
+    background: #ff6b6b;
+    color: white;
+}
+
+#noBtn {
+    background: #ddd;
+    position: absolute;
+    left: 55%;
+}
+
+/* Grey Mode */
+.grey {
+    background: linear-gradient(to bottom, #536976, #292E49);
+}
+.grey h1 { color: #ccc; }
+
+/* Effects */
+.confetti, .rain, .heartbreak {
+    position: fixed;
+    top: -10vh;
+    pointer-events: none;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to { transform: translateY(120vh); opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg-hearts" id="bgHearts"></div>
+
+<div class="card">
+    <div class="gif-container">
+        <img id="mascot" src="waiting.gif" alt="Puppy">
+    </div>
+    <h1 id="question">Will you be my Valentine? 💖</h1>
+
+    <div class="btn-container">
+        <button id="yesBtn">YES</button>
+        <button id="noBtn">NO</button>
+    </div>
+</div>
+
+<script>
+const mascot = document.getElementById("mascot");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const question = document.getElementById("question");
+const body = document.body;
+const bgHearts = document.getElementById("bgHearts");
+
+let jumps = 0;
+let yesScale = 1;
+const maxJumps = 3;
+
+/* Puppy change */
+function changePuppy(src) {
+    mascot.classList.add("fade-out");
+    setTimeout(() => {
+        mascot.src = src;
+        mascot.classList.remove("fade-out");
+        mascot.classList.add("fade-in");
+        setTimeout(() => mascot.classList.remove("fade-in"), 400);
+    }, 400);
+}
+
+/* Floating hearts */
+setInterval(() => {
+    const h = document.createElement("div");
+    h.className = "bg-heart";
+    h.innerText = "❤️";
+    h.style.left = Math.random() * 100 + "vw";
+    h.style.fontSize = Math.random() * 20 + 10 + "px";
+    h.style.animationDuration = Math.random() * 5 + 5 + "s";
+    bgHearts.appendChild(h);
+    setTimeout(() => h.remove(), 10000);
+}, 300);
+
+/* Runaway NO */
+function moveNo() {
+    if (jumps >= maxJumps) return;
+
+    noBtn.style.position = "fixed";
+    noBtn.style.left = Math.random() * (window.innerWidth - 80) + "px";
+    noBtn.style.top = Math.random() * (window.innerHeight - 50) + "px";
+
+    jumps++;
+    yesScale += 0.15;
+    yesBtn.style.transform = `scale(${yesScale})`;
+
+    mascot.classList.add("shake");
+    setTimeout(() => mascot.classList.remove("shake"), 400);
+
+    if (yesScale > 1.5) question.innerText = "Please say yes 🥺❤️";
+}
+
+noBtn.addEventListener("mouseover", moveNo);
+noBtn.addEventListener("touchstart", e => { e.preventDefault(); moveNo(); });
+
+/* YES */
+yesBtn.onclick = () => {
+    question.innerText = "Hehehee I knew it ❤️";
+    changePuppy("happy.gif");
+    noBtn.remove();
+    yesBtn.innerText = "YAY!";
+    startConfetti();
+};
+
+/* NO */
+noBtn.onclick = () => {
+    question.innerText = "Okie... 💔";
+    changePuppy("sad.gif");
+    yesBtn.remove();
+    noBtn.remove();
+    body.classList.add("grey");
+    startRain();
+    startHeartbreak();
+};
+
+/* Effects */
+function startConfetti() {
+    for (let i = 0; i < 120; i++) {
+        const c = document.createElement("div");
+        c.className = "confetti";
+        c.innerText = ["❤️","🎉","⭐"][Math.floor(Math.random()*3)];
+        c.style.left = Math.random()*100+"vw";
+        c.style.fontSize = Math.random()*20+15+"px";
+        c.style.animationDuration = Math.random()*3+2+"s";
+        body.appendChild(c);
+        setTimeout(() => c.remove(), 5000);
+    }
+}
+
+function startRain() {
+    setInterval(() => {
+        const r = document.createElement("div");
+        r.className = "rain";
+        r.innerText = "💧";
+        r.style.left = Math.random()*100+"vw";
+        r.style.animationDuration = Math.random()*3+2+"s";
+        body.appendChild(r);
+        setTimeout(() => r.remove(), 5000);
+    }, 80);
+}
+
+function startHeartbreak() {
+    setInterval(() => {
+        const h = document.createElement("div");
+        h.className = "heartbreak";
+        h.innerText = "💔";
+        h.style.left = Math.random()*100+"vw";
+        h.style.animationDuration = Math.random()*4+3+"s";
+        body.appendChild(h);
+        setTimeout(() => h.remove(), 6000);
+    }, 400);
+}
+</script>
+
+</body>
+</html>
